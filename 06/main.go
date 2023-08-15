@@ -9,35 +9,32 @@ import (
 )
 
 const s int = 1000
-const turnOn string = "turn on"
-const turnOff string = "turn off"
-const toggle string = "toggle"
 
 type grid = [s][s]int
-type gridTransformFunc = func(grid *grid, instruction string, y int, x int)
+type instFn = func(grid *grid, y int, x int)
 
 func main() {
-	g1 := parse("input", applyLights)
+	g1 := parse("input", turnOnLight, turnOffLight, toggleLight)
 	fmt.Println("Part 1:", countLitLights(&g1))
 
-	g2 := parse("input", applyBrightness)
+	g2 := parse("input", addBrightness, reduceBrightness, addBrightnessByTwo)
 	fmt.Println("Part 2:", countBrightness(&g2))
 }
 
-func applyBrightness(grid *grid, instruction string, y int, x int) {
-	switch instruction {
-	case turnOn:
-		grid[y][x] += 1
-		break
-	case turnOff:
-		if grid[y][x] > 0 {
-			grid[y][x] -= 1
-		}
-		break
-	case toggle:
-		grid[y][x] += 2
-		break
+func addBrightness(grid *grid, y int, x int) {
+	grid[y][x] += 1
+}
+
+func reduceBrightness(grid *grid, y int, x int) {
+	if grid[y][x] > 0 {
+		return
 	}
+
+	grid[y][x] -= 1
+}
+
+func addBrightnessByTwo(grid *grid, y int, x int) {
+	grid[y][x] += 2
 }
 
 func countBrightness(grid *grid) int {
@@ -50,22 +47,16 @@ func countBrightness(grid *grid) int {
 	return b
 }
 
-func applyLights(grid *grid, instruction string, y int, x int) {
-	switch instruction {
-	case turnOn:
-		grid[y][x] = 1
-		break
-	case turnOff:
-		grid[y][x] = 0
-		break
-	case toggle:
-		if grid[y][x] == 0 {
-			grid[y][x] = 1
-		} else {
-			grid[y][x] = 0
-		}
-		break
-	}
+func turnOnLight(grid *grid, y int, x int) {
+	grid[y][x] = 1
+}
+
+func turnOffLight(grid *grid, y int, x int) {
+	grid[y][x] = 0
+}
+
+func toggleLight(grid *grid, y int, x int) {
+	grid[y][x] ^= 1
 }
 
 func countLitLights(grid *grid) int {
@@ -80,7 +71,7 @@ func countLitLights(grid *grid) int {
 	return count
 }
 
-func parse(file string, gridTransformer gridTransformFunc) grid {
+func parse(file string, turnOn instFn, turnOff instFn, toggle instFn) grid {
 	var g grid
 	readFile, err := os.Open(file)
 	defer readFile.Close()
@@ -107,7 +98,17 @@ func parse(file string, gridTransformer gridTransformFunc) grid {
 
 		for y := sy; y <= ey; y++ {
 			for x := sx; x <= ex; x++ {
-				gridTransformer(&g, t, y, x)
+				switch t {
+				case "turn on":
+					turnOn(&g, y, x)
+					break
+				case "turn off":
+					turnOff(&g, y, x)
+					break
+				case "toggle":
+					toggle(&g, y, x)
+					break
+				}
 			}
 		}
 	}
