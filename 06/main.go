@@ -11,52 +11,40 @@ import (
 
 const s int = 1000
 
-type instruction struct {
-	t      string
-	startX int
-	startY int
-	endX   int
-	endY   int
-}
+type grid = [s][s]int
+type gridTransformFunc = func(grid *grid, instruction string, y int, x int)
 
 func main() {
-	instructions, err := parse("input")
+	g1, err := parse("input", applyLights)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Part 1:", countLitLights(&g1))
 
-	var grid [s][s]int
-	applyLights(&grid, instructions)
-	fmt.Println("Part 1:", countLitLights(&grid))
-
-	var brightnessGrid [s][s]int
-	applyBrightness(&brightnessGrid, instructions)
-	fmt.Println("Part 2:", countBrightness(&brightnessGrid))
+	g2, err2 := parse("input", applyBrightness)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	fmt.Println("Part 2:", countBrightness(&g2))
 }
 
-func applyBrightness(grid *[s][s]int, instructions []instruction) {
-	for _, in := range instructions {
-		for y := in.startY; y <= in.endY; y++ {
-			for x := in.startX; x <= in.endX; x++ {
-				switch in.t {
-				case "turn on":
-					grid[y][x] += 1
-					break
-				case "turn off":
-					if grid[y][x] > 0 {
-						grid[y][x] -= 1
-					}
-					break
-				case "toggle":
-					grid[y][x] += 2
-					break
-				}
-			}
+func applyBrightness(grid *grid, instruction string, y int, x int) {
+	switch instruction {
+	case "turn on":
+		grid[y][x] += 1
+		break
+	case "turn off":
+		if grid[y][x] > 0 {
+			grid[y][x] -= 1
 		}
+		break
+	case "toggle":
+		grid[y][x] += 2
+		break
 	}
 }
 
-func countBrightness(grid *[s][s]int) int {
+func countBrightness(grid *grid) int {
 	b := 0
 	for y := 0; y < s; y++ {
 		for x := 0; x < s; x++ {
@@ -66,31 +54,25 @@ func countBrightness(grid *[s][s]int) int {
 	return b
 }
 
-func applyLights(grid *[s][s]int, instructions []instruction) {
-	for _, in := range instructions {
-		for y := in.startY; y <= in.endY; y++ {
-			for x := in.startX; x <= in.endX; x++ {
-				switch in.t {
-				case "turn on":
-					grid[y][x] = 1
-					break
-				case "turn off":
-					grid[y][x] = 0
-					break
-				case "toggle":
-					if grid[y][x] == 0 {
-						grid[y][x] = 1
-					} else {
-						grid[y][x] = 0
-					}
-					break
-				}
-			}
+func applyLights(grid *grid, instruction string, y int, x int) {
+	switch instruction {
+	case "turn on":
+		grid[y][x] = 1
+		break
+	case "turn off":
+		grid[y][x] = 0
+		break
+	case "toggle":
+		if grid[y][x] == 0 {
+			grid[y][x] = 1
+		} else {
+			grid[y][x] = 0
 		}
+		break
 	}
 }
 
-func countLitLights(grid *[s][s]int) int {
+func countLitLights(grid *grid) int {
 	count := 0
 	for y := 0; y < s; y++ {
 		for x := 0; x < s; x++ {
@@ -102,13 +84,13 @@ func countLitLights(grid *[s][s]int) int {
 	return count
 }
 
-func parse(file string) ([]instruction, error) {
-	instructions := []instruction{}
+func parse(file string, gridTransformer gridTransformFunc) (grid, error) {
+	var g grid
 	readFile, err := os.Open(file)
 	defer readFile.Close()
 
 	if err != nil {
-		return instructions, err
+		return g, err
 	}
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -127,10 +109,12 @@ func parse(file string) ([]instruction, error) {
 		ex, _ := strconv.Atoi(string(matches[0][4]))
 		ey, _ := strconv.Atoi(string(matches[0][5]))
 
-		instructions = append(instructions, instruction{
-			t, sx, sy, ex, ey,
-		})
+		for y := sy; y <= ey; y++ {
+			for x := sx; x <= ex; x++ {
+				gridTransformer(&g, t, y, x)
+			}
+		}
 	}
 
-	return instructions, nil
+	return g, nil
 }
