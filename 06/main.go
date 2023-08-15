@@ -9,6 +9,9 @@ import (
 )
 
 const s int = 1000
+const turnOn string = "turn on"
+const turnOff string = "turn off"
+const toggle string = "toggle"
 
 type grid = [s][s]int
 type gridTransformFunc = func(grid *grid, instruction string, y int, x int)
@@ -23,15 +26,15 @@ func main() {
 
 func applyBrightness(grid *grid, instruction string, y int, x int) {
 	switch instruction {
-	case "turn on":
+	case turnOn:
 		grid[y][x] += 1
 		break
-	case "turn off":
+	case turnOff:
 		if grid[y][x] > 0 {
 			grid[y][x] -= 1
 		}
 		break
-	case "toggle":
+	case toggle:
 		grid[y][x] += 2
 		break
 	}
@@ -49,13 +52,13 @@ func countBrightness(grid *grid) int {
 
 func applyLights(grid *grid, instruction string, y int, x int) {
 	switch instruction {
-	case "turn on":
+	case turnOn:
 		grid[y][x] = 1
 		break
-	case "turn off":
+	case turnOff:
 		grid[y][x] = 0
 		break
-	case "toggle":
+	case toggle:
 		if grid[y][x] == 0 {
 			grid[y][x] = 1
 		} else {
