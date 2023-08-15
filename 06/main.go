@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -15,16 +14,10 @@ type grid = [s][s]int
 type gridTransformFunc = func(grid *grid, instruction string, y int, x int)
 
 func main() {
-	g1, err := parse("input", applyLights)
-	if err != nil {
-		log.Fatal(err)
-	}
+	g1 := parse("input", applyLights)
 	fmt.Println("Part 1:", countLitLights(&g1))
 
-	g2, err2 := parse("input", applyBrightness)
-	if err2 != nil {
-		log.Fatal(err2)
-	}
+	g2 := parse("input", applyBrightness)
 	fmt.Println("Part 2:", countBrightness(&g2))
 }
 
@@ -84,13 +77,13 @@ func countLitLights(grid *grid) int {
 	return count
 }
 
-func parse(file string, gridTransformer gridTransformFunc) (grid, error) {
+func parse(file string, gridTransformer gridTransformFunc) grid {
 	var g grid
 	readFile, err := os.Open(file)
 	defer readFile.Close()
 
 	if err != nil {
-		return g, err
+		panic(err)
 	}
 
 	fileScanner := bufio.NewScanner(readFile)
@@ -116,5 +109,5 @@ func parse(file string, gridTransformer gridTransformFunc) (grid, error) {
 		}
 	}
 
-	return g, nil
+	return g
 }
