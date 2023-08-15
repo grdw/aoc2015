@@ -28,6 +28,42 @@ func main() {
 	var grid [s][s]int
 	applyLights(&grid, instructions)
 	fmt.Println("Part 1:", countLitLights(&grid))
+
+	var brightnessGrid [s][s]int
+	applyBrightness(&brightnessGrid, instructions)
+	fmt.Println("Part 2:", countBrightness(&brightnessGrid))
+}
+
+func applyBrightness(grid *[s][s]int, instructions []instruction) {
+	for _, in := range instructions {
+		for y := in.startY; y <= in.endY; y++ {
+			for x := in.startX; x <= in.endX; x++ {
+				switch in.t {
+				case "turn on":
+					grid[y][x] += 1
+					break
+				case "turn off":
+					if grid[y][x] > 0 {
+						grid[y][x] -= 1
+					}
+					break
+				case "toggle":
+					grid[y][x] += 2
+					break
+				}
+			}
+		}
+	}
+}
+
+func countBrightness(grid *[s][s]int) int {
+	b := 0
+	for y := 0; y < s; y++ {
+		for x := 0; x < s; x++ {
+			b += grid[y][x]
+		}
+	}
+	return b
 }
 
 func applyLights(grid *[s][s]int, instructions []instruction) {
