@@ -14,27 +14,27 @@ type grid = [s][s]int
 type instFn = func(grid *grid, y int, x int)
 
 func main() {
-	g1 := parse("input", turnOnLight, turnOffLight, toggleLight)
+	g1 := parse(
+		"input",
+		func(grid *grid, y int, x int) { grid[y][x] = 1 },
+		func(grid *grid, y int, x int) { grid[y][x] = 0 },
+		func(grid *grid, y int, x int) { grid[y][x] ^= 1 },
+	)
 	fmt.Println("Part 1:", countLitLights(&g1))
 
-	g2 := parse("input", addBrightness, reduceBrightness, addBrightnessByTwo)
+	g2 := parse(
+		"input",
+		func(grid *grid, y int, x int) { grid[y][x] += 1 },
+		func(grid *grid, y int, x int) {
+			if grid[y][x] < 1 {
+				return
+			}
+
+			grid[y][x] -= 1
+		},
+		func(grid *grid, y int, x int) { grid[y][x] += 2 },
+	)
 	fmt.Println("Part 2:", countBrightness(&g2))
-}
-
-func addBrightness(grid *grid, y int, x int) {
-	grid[y][x] += 1
-}
-
-func reduceBrightness(grid *grid, y int, x int) {
-	if grid[y][x] > 0 {
-		return
-	}
-
-	grid[y][x] -= 1
-}
-
-func addBrightnessByTwo(grid *grid, y int, x int) {
-	grid[y][x] += 2
 }
 
 func countBrightness(grid *grid) int {
@@ -45,18 +45,6 @@ func countBrightness(grid *grid) int {
 		}
 	}
 	return b
-}
-
-func turnOnLight(grid *grid, y int, x int) {
-	grid[y][x] = 1
-}
-
-func turnOffLight(grid *grid, y int, x int) {
-	grid[y][x] = 0
-}
-
-func toggleLight(grid *grid, y int, x int) {
-	grid[y][x] ^= 1
 }
 
 func countLitLights(grid *grid) int {
