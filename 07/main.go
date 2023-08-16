@@ -12,8 +12,10 @@ import (
 type umap = map[string]uint16
 type operation struct {
 	id       string
-	operand  string
 	executed bool
+	left     string
+	right    string
+	op       string
 }
 
 func main() {
@@ -42,55 +44,45 @@ func solveWires(operations []operation, values umap) {
 			continue
 		}
 
-		s := strings.Split(o.operand, " ")
-		if isLower(s[0]) && len(s) > 1 {
-			l, lok := values[s[0]]
-			r, rok := values[s[2]]
-			lv, lerr := strconv.Atoi(s[0])
-			rv, rerr := strconv.Atoi(s[2])
+		l, lok := values[o.left]
+		r, rok := values[o.right]
+		lv, lerr := strconv.Atoi(o.left)
+		rv, rerr := strconv.Atoi(o.right)
 
-			if lerr == nil {
-				l = uint16(lv)
-			}
-
-			if rerr == nil {
-				r = uint16(rv)
-			}
-
-			if !((lok || lerr == nil) && (rok || rerr == nil)) {
-				continue
-			}
-
-			switch s[1] {
-			case "AND":
-				values[o.id] = l & r
-				break
-			case "OR":
-				values[o.id] = l | r
-				break
-			case "LSHIFT":
-				values[o.id] = l << r
-				break
-			case "RSHIFT":
-				values[o.id] = l >> r
-				break
-			}
-			o.executed = true
-		} else if s[0] == "NOT" {
-			val, ok := values[s[1]]
-
-			if ok {
-				values[o.id] = ^val
-				o.executed = true
-			}
-		} else {
-			val, ok := values[s[0]]
-
-			if ok {
-				values[o.id] = val
-				o.executed = true
-			}
+		if lerr == nil {
+			l = uint16(lv)
 		}
+
+		if rerr == nil {
+			r = uint16(rv)
+		}
+
+		// Tests if the gate is closed
+		if !((lok || lerr == nil || o.op == "NOT" || o.op == "ASSIGN") && (rok || rerr == nil)) {
+			continue
+		}
+
+		switch o.op {
+		case "AND":
+			values[o.id] = l & r
+			break
+		case "OR":
+			values[o.id] = l | r
+			break
+		case "LSHIFT":
+			values[o.id] = l << r
+			break
+		case "RSHIFT":
+			values[o.id] = l >> r
+			break
+		case "NOT":
+			values[o.id] = ^r
+			break
+		case "ASSIGN":
+			values[o.id] = r
+			break
+		}
+		o.executed = true
 	}
 }
 
@@ -122,12 +114,37 @@ func parse(file string) ([]operation, umap) {
 
 		value, err := strconv.Atoi(matches[0])
 		id := matches[1]
+
 		if err != nil {
-			operations = append(operations, operation{id, matches[0], false})
+			left, right, op := parseOp(matches[0])
+
+			operations = append(
+				operations,
+				operation{id, false, left, right, op},
+			)
 		} else {
 			values[id] = uint16(value)
 		}
 	}
 
 	return operations, values
+}
+
+func parseOp(op string) (string, string, string) {
+	left, right, o := "", "", ""
+	s := strings.Split(op, " ")
+
+	if isLower(s[0]) && len(s) > 1 {
+		left = s[0]
+		o = s[1]
+		right = s[2]
+	} else if s[0] == "NOT" {
+		o = "NOT"
+		right = s[1]
+	} else {
+		o = "ASSIGN"
+		right = s[0]
+	}
+
+	return left, right, o
 }
