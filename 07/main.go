@@ -25,7 +25,7 @@ func main() {
 	operations, values = parse("input")
 	values["b"] = solution
 	longSolve(operations, values)
-	fmt.Println("Solution to Part 2:", values["a"])
+	fmt.Println("Solution to part 2:", values["a"])
 }
 
 func longSolve(operations []operation, values umap) {
@@ -81,12 +81,14 @@ func solveWires(operations []operation, values umap) {
 
 			if ok {
 				values[o.id] = ^val
+				o.executed = true
 			}
 		} else {
 			val, ok := values[s[0]]
 
 			if ok {
 				values[o.id] = val
+				o.executed = true
 			}
 		}
 	}
