@@ -19,7 +19,13 @@ type operation struct {
 func main() {
 	operations, values := parse("input")
 	longSolve(operations, values)
-	fmt.Println("Solution to Part 1:", values["a"])
+	solution := values["a"]
+	fmt.Println("Solution to part 1:", solution)
+
+	operations, values = parse("input")
+	values["b"] = solution
+	longSolve(operations, values)
+	fmt.Println("Solution to Part 2:", values["a"])
 }
 
 func longSolve(operations []operation, values umap) {
@@ -63,10 +69,10 @@ func solveWires(operations []operation, values umap) {
 				values[o.id] = l | r
 				break
 			case "LSHIFT":
-				values[o.id] = l << rv
+				values[o.id] = l << r
 				break
 			case "RSHIFT":
-				values[o.id] = l >> rv
+				values[o.id] = l >> r
 				break
 			}
 			o.executed = true
