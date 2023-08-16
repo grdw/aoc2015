@@ -86,15 +86,6 @@ func solveWires(operations []operation, values umap) {
 	}
 }
 
-func isLower(s string) bool {
-	for _, r := range s {
-		if !unicode.IsLower(r) && unicode.IsLetter(r) {
-			return false
-		}
-	}
-	return true
-}
-
 func parse(file string) ([]operation, umap) {
 	operations := []operation{}
 	values := make(umap)
@@ -131,20 +122,23 @@ func parse(file string) ([]operation, umap) {
 }
 
 func parseOp(op string) (string, string, string) {
-	left, right, o := "", "", ""
+	left := ""
 	s := strings.Split(op, " ")
 
 	if isLower(s[0]) && len(s) > 1 {
-		left = s[0]
-		o = s[1]
-		right = s[2]
+		return s[0], s[2], s[1]
 	} else if s[0] == "NOT" {
-		o = "NOT"
-		right = s[1]
+		return left, s[1], "NOT"
 	} else {
-		o = "ASSIGN"
-		right = s[0]
+		return left, s[0], "ASSIGN"
 	}
+}
 
-	return left, right, o
+func isLower(s string) bool {
+	for _, r := range s {
+		if !unicode.IsLower(r) && unicode.IsLetter(r) {
+			return false
+		}
+	}
+	return true
 }
