@@ -5,14 +5,20 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"regexp"
 	"strconv"
+	"strings"
 )
 
 type edgeMap = map[string]int
+type route struct {
+	from   string
+	to     string
+	weight int
+}
 
 func main() {
-	edges, nodes := parse("input")
+	routes := parse("input")
+	edges, nodes := extractGraphEls(routes)
 	min := math.MaxInt32
 	max := 0
 	maxPerms := factorial(len(nodes))
@@ -75,11 +81,37 @@ func next_perm(a []int) {
 	}
 }
 
-func parse(file string) (edgeMap, []int) {
+func extractGraphEls(routes []route) (edgeMap, []int) {
 	nodes := []int{}
 	m := make(map[string]int)
 	edgeMap := make(edgeMap)
 	id := 0
+
+	for _, r := range routes {
+		s := []string{r.to, r.from}
+
+		for _, sp := range s {
+			_, ok := m[sp]
+			if !ok {
+				m[sp] = id
+				nodes = append(nodes, id)
+				id++
+			}
+		}
+	}
+
+	for _, r := range routes {
+		lr := fmt.Sprintf("%d%d", m[r.from], m[r.to])
+		rl := fmt.Sprintf("%d%d", m[r.to], m[r.from])
+		edgeMap[lr] = r.weight
+		edgeMap[rl] = r.weight
+	}
+
+	return edgeMap, nodes
+}
+
+func parse(file string) []route {
+	routes := []route{}
 	readFile, err := os.Open(file)
 	defer readFile.Close()
 
@@ -91,32 +123,13 @@ func parse(file string) (edgeMap, []int) {
 	fileScanner.Split(bufio.ScanLines)
 
 	for fileScanner.Scan() {
-		line := fileScanner.Bytes()
-		re := regexp.MustCompile(`(\w+) to (\w+) = (\d+)`)
-		matches := re.FindAllSubmatch(line, -1)
-		from := string(matches[0][1])
-		to := string(matches[0][2])
-		weight, _ := strconv.Atoi(string(matches[0][3]))
-		_, fok := m[from]
-		_, tok := m[to]
+		line := fileScanner.Text()
+		sp := strings.Split(line, " ")
 
-		if !fok {
-			m[from] = id
-			nodes = append(nodes, id)
-			id++
-		}
-
-		if !tok {
-			m[to] = id
-			nodes = append(nodes, id)
-			id++
-		}
-
-		lr := fmt.Sprintf("%d%d", m[from], m[to])
-		rl := fmt.Sprintf("%d%d", m[to], m[from])
-		edgeMap[lr] = weight
-		edgeMap[rl] = weight
+		from, to := sp[0], sp[2]
+		weight, _ := strconv.Atoi(sp[4])
+		routes = append(routes, route{from, to, weight})
 	}
 
-	return edgeMap, nodes
+	return routes
 }
