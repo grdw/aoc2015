@@ -59,7 +59,7 @@ func countLitLights(grid *grid) int {
 	return count
 }
 
-func parse(file string, turnOn instFn, turnOff instFn, toggle instFn) grid {
+func parse(file string, turnOn, turnOff, toggle instFn) grid {
 	var g grid
 	readFile, err := os.Open(file)
 	defer readFile.Close()
