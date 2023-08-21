@@ -4,11 +4,13 @@ import (
 	"fmt"
 )
 
+const input string = "1113122113"
+
 func main() {
-	input := rbuv{[]byte("1113122113"), 0}
-	fmt.Println("Part 1:", applyN(&input, 40))
-	input = rbuv{[]byte("1113122113"), 0}
-	fmt.Println("Part 2:", applyN(&input, 50))
+	r := rbuv{[]byte(input), 0}
+	fmt.Println("Part 1:", applyN(&r, 40))
+	r = rbuv{[]byte(input), 0}
+	fmt.Println("Part 2:", applyN(&r, 50))
 }
 
 func applyN(input *rbuv, times int) int {
