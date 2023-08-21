@@ -43,10 +43,6 @@ func (b *rbuv) Advance() {
 	b.pos++
 }
 
-func (b *rbuv) PeekByte() byte {
-	return b.data[b.pos]
-}
-
 func (b *wbuv) Write(i int, rb byte) {
 	s := byte(i + 48)
 	ap := []byte{s, rb}
@@ -54,7 +50,7 @@ func (b *wbuv) Write(i int, rb byte) {
 }
 
 func lookAndSaySequence(r *rbuv, w *wbuv) {
-	prevRune := r.PeekByte()
+	prevRune := r.ReadByte()
 	count := 0
 
 	for r.pos <= len(r.data) {
