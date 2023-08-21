@@ -22,6 +22,14 @@ func TestIncrement(t *testing.T) {
 			input:  []byte("zz"),
 			output: "aaa",
 		},
+		{
+			input:  []byte("az"),
+			output: "ba",
+		},
+		{
+			input:  []byte("vzbxxyyy"),
+			output: "vzbxxyyz",
+		},
 	}
 
 	for _, test := range tests {
@@ -57,6 +65,10 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			input: []byte("abcdffaa"),
+			valid: true,
+		},
+		{
+			input: []byte("vzbxxyzz"),
 			valid: true,
 		},
 	}

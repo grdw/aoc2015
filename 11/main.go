@@ -4,7 +4,7 @@ import "fmt"
 
 const input string = "vzbxkghb"
 const min byte = 97
-const max byte = min + 25
+const max byte = min + 26
 
 func increment(input []byte) []byte {
 	output := input
@@ -17,7 +17,7 @@ func increment(input []byte) []byte {
 			output[index]++
 			break
 		} else {
-			output[index] = 97
+			output[index] = 'a'
 			index--
 		}
 	}
@@ -25,7 +25,7 @@ func increment(input []byte) []byte {
 }
 
 func valid(input []byte) bool {
-	return validTriple(input) && validLetters(input) && validDouble(input)
+	return validTriple(input) && validDoubleAndLetters(input)
 }
 
 func validTriple(input []byte) bool {
@@ -37,28 +37,22 @@ func validTriple(input []byte) bool {
 	return false
 }
 
-func validLetters(input []byte) bool {
+func validDoubleAndLetters(input []byte) bool {
+	count := 0
+	prevInput := byte(0)
+	doublePairChar := byte(0)
+
 	for _, l := range input {
 		if l == 'i' || l == 'o' || l == 'l' {
 			return false
 		}
-	}
-	return true
-}
 
-func validDouble(input []byte) bool {
-	count := 0
-	prevInput := byte(0)
-	ticked := make(map[byte]bool)
-
-	for i := 0; i < len(input); i++ {
-		_, ok := ticked[input[i]]
-		if input[i] == prevInput && !ok {
+		if l == prevInput && doublePairChar != l {
 			count++
-			ticked[input[i]] = true
+			doublePairChar = l
 		}
 
-		prevInput = input[i]
+		prevInput = l
 	}
 
 	return count == 2
@@ -74,5 +68,6 @@ func findNextPassword(input []byte) []byte {
 }
 
 func main() {
-	fmt.Println("vim-go")
+	fmt.Println("part 1:", string(findNextPassword([]byte(input))))
+	fmt.Println("part 2:", string(findNextPassword(findNextPassword([]byte(input)))))
 }
