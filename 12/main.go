@@ -65,13 +65,11 @@ func recurseParse(value interface{}, total *int) {
 				recurseParse(vv, total)
 			}
 		}
-
 		break
 	case []interface{}:
 		for _, vv := range v {
 			recurseParse(vv, total)
 		}
-
 		break
 	}
 }
