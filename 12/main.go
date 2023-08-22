@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("Part 1:", parseInput(content))
+	fmt.Println("Part 2:", parseInputNoRed(content))
 }
 
 func parseInput(text []byte) int {
@@ -31,4 +33,45 @@ func parseInput(text []byte) int {
 		}
 	}
 	return total
+}
+
+func parseInputNoRed(text []byte) int {
+	var values interface{}
+	err := json.Unmarshal(text, &values)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	total := 0
+	recurseParse(values, &total)
+	return total
+}
+
+func recurseParse(value interface{}, total *int) {
+	switch v := value.(type) {
+	case float64:
+		*total += int(v)
+		break
+	case map[string]interface{}:
+		isRed := false
+		for _, red := range v {
+			if red == "red" {
+				isRed = true
+				break
+			}
+		}
+		if !isRed {
+			for _, vv := range v {
+				recurseParse(vv, total)
+			}
+		}
+
+		break
+	case []interface{}:
+		for _, vv := range v {
+			recurseParse(vv, total)
+		}
+
+		break
+	}
 }
