@@ -8,8 +8,6 @@ import (
 	"strconv"
 )
 
-type calcHeapFunc = func(a []int, i []ingredient) int
-
 type ingredient struct {
 	name       string
 	capacity   int
@@ -28,15 +26,18 @@ func balancing(ingredients []ingredient) int {
 	max := 0
 	spoons := 100
 	l := len(ingredients)
-	groups := fixedPartition(spoons, l)
+	groups := fixedLengthPartitions(spoons, l)
 
 	for _, g := range groups {
-		heapPermutation(g, l, ingredients, permFunc, &max)
+		nMax := calculate(g, ingredients)
+		if nMax > max {
+			max = nMax
+		}
 	}
 	return max
 }
 
-func permFunc(a []int, ingredients []ingredient) int {
+func calculate(a []int, ingredients []ingredient) int {
 	totalI := ingredient{name: "Total"}
 
 	for i, amount := range a {
@@ -64,68 +65,33 @@ func permFunc(a []int, ingredients []ingredient) int {
 	return totalI.capacity * totalI.durability * totalI.flavor * totalI.texture
 }
 
-// Stolen from some Python code and translated it by hand
-func fixedPartition(n int, l int) [][]int {
-	groups := [][]int{}
-	partition := []int{n - l + 1}
-	for i := 0; i < l-1; i++ {
-		partition = append(partition, 1)
-	}
-	for {
-		copyGroup := make([]int, len(partition))
-		copy(copyGroup, partition)
-		groups = append(groups, copyGroup)
+func fixedLengthPartitions(n, s int) [][]int {
+	var partitions [][]int
 
-		if partition[0]-1 > partition[1] {
-			partition[0] -= 1
-			partition[1] += 1
-			continue
+	var generatePartitions func(remaining, length int, partition []int)
+	generatePartitions = func(remaining, length int, partition []int) {
+		if length == s {
+			if remaining == 0 {
+				partitions = append(partitions, append([]int(nil), partition...))
+			}
+			return
 		}
-		j := 2
-		s := partition[0] + partition[1] - 1
-		for j < l && partition[j] >= partition[0]-1 {
-			s += partition[j]
-			j += 1
+
+		for i := min(remaining, n); i >= 0; i-- {
+			partition[length] = i
+			generatePartitions(remaining-i, length+1, partition)
 		}
-		if j >= l {
-			break
-		}
-		x := partition[j] + 1
-		partition[j] = x
-		j -= 1
-		for j > 0 {
-			partition[j] = x
-			s -= x
-			j -= 1
-		}
-		partition[0] = s
 	}
-	return groups
+
+	generatePartitions(n, 0, make([]int, s))
+	return partitions
 }
 
-func heapPermutation(
-	a []int,
-	size int,
-	ingredients []ingredient,
-	calc calcHeapFunc,
-	max *int,
-) {
-	if size == 1 {
-		newMax := calc(a, ingredients)
-		if newMax > *max {
-			*max = newMax
-		}
+func min(a, b int) int {
+	if a < b {
+		return a
 	}
-
-	for i := 0; i < size; i++ {
-		heapPermutation(a, size-1, ingredients, calc, max)
-
-		if size%2 == 1 {
-			a[0], a[size-1] = a[size-1], a[0]
-		} else {
-			a[i], a[size-1] = a[size-1], a[i]
-		}
-	}
+	return b
 }
 
 func parse(file string) []ingredient {
