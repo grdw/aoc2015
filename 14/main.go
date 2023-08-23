@@ -28,8 +28,8 @@ func maxes(rs []reindeer, seconds int) (int, int) {
 	points := make(map[string]int)
 	distance := make(map[string]int)
 	cycles := make(map[string]int)
-
 	clock := 0
+
 	for clock <= seconds {
 		for _, r := range rs {
 			pausing := cycles[r.name] == r.time
@@ -41,29 +41,26 @@ func maxes(rs []reindeer, seconds int) (int, int) {
 			}
 		}
 
-		wR := ""
-		maxP := 0
-		for rName, d := range distance {
-			if d > maxP {
-				maxP = d
-				wR = rName
-			}
-		}
-		points[wR]++
+		winner, _ := max(distance)
+		points[winner]++
 		clock++
 	}
 
-	return max(distance), max(points)
+	_, maxD := max(distance)
+	_, maxP := max(points)
+	return maxD, maxP
 }
 
-func max(m map[string]int) int {
+func max(m map[string]int) (string, int) {
 	maxP := 0
-	for _, p := range m {
+	maxKey := ""
+	for k, p := range m {
 		if p > maxP {
 			maxP = p
+			maxKey = k
 		}
 	}
-	return maxP
+	return maxKey, maxP
 }
 
 func parse(file string) []reindeer {
