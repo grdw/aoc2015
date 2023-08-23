@@ -24,18 +24,24 @@ func main() {
 	query["cars"] = 2
 	query["perfumes"] = 1
 
+	fmt.Println("Part 1:", findAuntieExact(auntieSues, query))
+
+}
+
+func findAuntieExact(auntieSues []sue, q map[string]int) int {
 	for i, a := range auntieSues {
 		match := true
 		for k, v := range a {
-			if query[k] != v {
+			if q[k] != v {
 				match = false
 			}
 		}
 
 		if match {
-			fmt.Println("Part 1:", i+1)
+			return i + 1
 		}
 	}
+	return -1
 }
 
 func parse(file string) []sue {
