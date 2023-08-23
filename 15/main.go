@@ -66,7 +66,7 @@ func fixedLengthPartitions(n, s int) [][]int {
 			return
 		}
 
-		for i := min(remaining, n); i >= 0; i-- {
+		for i := 0; i <= min(remaining, n); i++ {
 			partition[length] = i
 			generatePartitions(remaining-i, length+1, partition)
 		}
