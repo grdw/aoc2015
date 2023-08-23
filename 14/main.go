@@ -16,40 +16,57 @@ type reindeer struct {
 }
 
 func main() {
-	fmt.Println("Ex:", travel(parse("input_test"), 1000))
-	fmt.Println("Part 1:", travel(parse("input"), 2503))
+	exMaxD, exMaxP := maxes(parse("input_test"), 1000)
+	part1, part2 := maxes(parse("input"), 2503)
+	fmt.Println("Ex:", exMaxD)
+	fmt.Println("Part 1:", part1)
+	fmt.Println("Ex:", exMaxP)
+	fmt.Println("Part 2:", part2)
 }
 
-func travel(rs []reindeer, seconds int) int {
+func maxes(rs []reindeer, seconds int) (int, int) {
+	points := make(map[string]int)
 	distance := make(map[string]int)
+	cycles := make(map[string]int)
 
-	for _, r := range rs {
-		clock := 0
-		cycle := 0
-
-		for clock < seconds {
-			p := cycle % r.time
-			distance[r.name] += r.speed
-
-			if p == (r.time - 1) {
-				clock += (r.pause + 1)
-				cycle = 0
+	clock := 0
+	for clock <= seconds {
+		for _, r := range rs {
+			pausing := cycles[r.name] == r.time
+			if !pausing {
+				distance[r.name] += r.speed
+				cycles[r.name] += 1
 			} else {
-				cycle++
-				clock++
+				v := clock % (r.time + r.pause)
+				if v == 0 {
+					cycles[r.name] = 0
+				}
 			}
 		}
+
+		wR := ""
+		maxP := 0
+		for rName, d := range distance {
+			if d > maxP {
+				maxP = d
+				wR = rName
+			}
+		}
+		points[wR]++
+		clock++
 	}
 
-	fmt.Println(distance)
-	max := 0
-	for _, d := range distance {
-		if d > max {
-			max = d
+	return max(distance), max(points)
+}
+
+func max(m map[string]int) int {
+	maxP := 0
+	for _, p := range m {
+		if p > maxP {
+			maxP = p
 		}
 	}
-
-	return max
+	return maxP
 }
 
 func parse(file string) []reindeer {
