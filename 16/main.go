@@ -25,7 +25,7 @@ func main() {
 	query["perfumes"] = 1
 
 	fmt.Println("Part 1:", findAuntieExact(auntieSues, query))
-
+	fmt.Println("Part 2:", findAuntieWithRanges(auntieSues, query))
 }
 
 func findAuntieExact(auntieSues []sue, q map[string]int) int {
@@ -34,6 +34,36 @@ func findAuntieExact(auntieSues []sue, q map[string]int) int {
 		for k, v := range a {
 			if q[k] != v {
 				match = false
+			}
+		}
+
+		if match {
+			return i + 1
+		}
+	}
+	return -1
+}
+
+func findAuntieWithRanges(auntieSues []sue, q map[string]int) int {
+	for i, a := range auntieSues {
+		match := true
+		for k, v := range a {
+			switch k {
+			case "trees", "cats":
+				if q[k] >= v {
+					match = false
+				}
+				break
+			case "pomeranians", "goldfish":
+				if q[k] <= v {
+					match = false
+				}
+				break
+			default:
+				if q[k] != v {
+					match = false
+				}
+				break
 			}
 		}
 
