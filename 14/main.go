@@ -36,11 +36,8 @@ func maxes(rs []reindeer, seconds int) (int, int) {
 			if !pausing {
 				distance[r.name] += r.speed
 				cycles[r.name] += 1
-			} else {
-				v := clock % (r.time + r.pause)
-				if v == 0 {
-					cycles[r.name] = 0
-				}
+			} else if clock%(r.time+r.pause) == 0 {
+				cycles[r.name] = 0
 			}
 		}
 
