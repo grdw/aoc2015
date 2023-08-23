@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+const nameIndex int = 0
+const speedIndex int = 3
+const timeIndex int = 6
+const pauseIndex int = 13
+
 type reindeer struct {
 	name  string
 	speed int // in km/s
@@ -80,10 +85,10 @@ func parse(file string) []reindeer {
 		line := fileScanner.Text()
 		words := strings.Split(line, " ")
 
-		speed, _ := strconv.Atoi(words[3])
-		time, _ := strconv.Atoi(words[6])
-		pause, _ := strconv.Atoi(words[13])
-		rs = append(rs, reindeer{words[0], speed, time, pause})
+		speed, _ := strconv.Atoi(words[speedIndex])
+		time, _ := strconv.Atoi(words[timeIndex])
+		pause, _ := strconv.Atoi(words[pauseIndex])
+		rs = append(rs, reindeer{words[nameIndex], speed, time, pause})
 	}
 
 	return rs
