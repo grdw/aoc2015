@@ -48,21 +48,10 @@ func calculate(a []int, ingredients []ingredient) int {
 		totalI.texture += ii.texture * amount
 	}
 
-	// This should be easier ...
-	if totalI.capacity < 0 {
-		totalI.capacity = 0
-	}
-	if totalI.durability < 0 {
-		totalI.durability = 0
-	}
-	if totalI.flavor < 0 {
-		totalI.flavor = 0
-	}
-	if totalI.texture < 0 {
-		totalI.texture = 0
-	}
-
-	return totalI.capacity * totalI.durability * totalI.flavor * totalI.texture
+	return max(totalI.capacity, 0) *
+		max(totalI.durability, 0) *
+		max(totalI.flavor, 0) *
+		max(totalI.texture, 0)
 }
 
 func fixedLengthPartitions(n, s int) [][]int {
@@ -89,6 +78,13 @@ func fixedLengthPartitions(n, s int) [][]int {
 
 func min(a, b int) int {
 	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
 		return a
 	}
 	return b
