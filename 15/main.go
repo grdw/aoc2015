@@ -19,17 +19,18 @@ type ingredient struct {
 
 func main() {
 	ingredients := parse("input")
-	fmt.Println("Part 1:", balancing(ingredients))
+	fmt.Println("Part 1:", balancing(ingredients, 0))
+	fmt.Println("Part 2:", balancing(ingredients, 500))
 }
 
-func balancing(ingredients []ingredient) int {
+func balancing(ingredients []ingredient, caloryCount int) int {
 	max := 0
 	spoons := 100
 	l := len(ingredients)
 	groups := fixedLengthPartitions(spoons, l)
 
 	for _, g := range groups {
-		nMax := calculate(g, ingredients)
+		nMax := calculate(g, ingredients, caloryCount)
 		if nMax > max {
 			max = nMax
 		}
@@ -37,7 +38,7 @@ func balancing(ingredients []ingredient) int {
 	return max
 }
 
-func calculate(a []int, ingredients []ingredient) int {
+func calculate(a []int, ingredients []ingredient, caloryCount int) int {
 	totalI := ingredient{name: "Total"}
 
 	for i, amount := range a {
@@ -46,12 +47,19 @@ func calculate(a []int, ingredients []ingredient) int {
 		totalI.durability += ii.durability * amount
 		totalI.flavor += ii.flavor * amount
 		totalI.texture += ii.texture * amount
+		totalI.calories += ii.calories * amount
 	}
 
-	return max(totalI.capacity, 0) *
+	total := max(totalI.capacity, 0) *
 		max(totalI.durability, 0) *
 		max(totalI.flavor, 0) *
 		max(totalI.texture, 0)
+
+	if caloryCount > 0 && totalI.calories != caloryCount {
+		return 0
+	} else {
+		return total
+	}
 }
 
 func fixedLengthPartitions(n, s int) [][]int {
