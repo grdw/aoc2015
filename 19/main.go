@@ -13,7 +13,6 @@ type replacements = map[string][]string
 
 func main() {
 	reps, input := parse("input")
-	fmt.Printf("%q\n", reps)
 	possibilities := molecules(input, reps)
 	fmt.Println("Part 1:", len(possibilities))
 }
