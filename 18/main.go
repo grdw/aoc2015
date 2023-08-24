@@ -89,32 +89,6 @@ func animate(grid [][]int, cycles int, locked bool) int {
 	return lightsOn(grid)
 }
 
-func printGrid(grid [][]int) {
-	gridSize := len(grid)
-	for y := 0; y < gridSize; y++ {
-		for x := 0; x < gridSize; x++ {
-			fmt.Print(grid[y][x])
-		}
-		fmt.Println()
-	}
-	fmt.Println()
-}
-
-func printLightGrid(grid [][]int) {
-	gridSize := len(grid)
-	for y := 0; y < gridSize; y++ {
-		for x := 0; x < gridSize; x++ {
-			if grid[y][x] == 1 {
-				fmt.Print("#")
-			} else {
-				fmt.Print(".")
-			}
-		}
-		fmt.Println()
-	}
-	fmt.Println()
-}
-
 func lightsOn(grid [][]int) int {
 	gridSize := len(grid)
 	on := 0
