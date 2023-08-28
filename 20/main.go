@@ -2,64 +2,40 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
 const input int = 36000000
 
 func main() {
-	p1 := gift()
+	p1 := gift(10, math.MaxInt64)
 	fmt.Println("part 1:", p1)
-	p2 := giftWithLimit()
+	p2 := gift(11, 50)
 	fmt.Println("part 2:", p2)
 }
 
-func gift() int {
-	houseIndex := 0
-	incr := 100
+func gift(s int, max int) int {
+	size := input / 10
+	var x [input / 10]int
 
-	for {
-		total := presents(houseIndex)
-
-		if total > input {
-			return houseIndex
-		}
-		houseIndex += incr
-	}
-}
-
-// TODO: This can be done better I guess...
-// .. but oh whelp, not a math genius... so brute force it is!
-func giftWithLimit() int {
-	houseIndex := 0
-	incr := 10
-
-	for {
-		total := presentsWithLimit(houseIndex)
-
-		if total > input {
-			return houseIndex
-		}
-		houseIndex += incr
-	}
-}
-
-func presentsWithLimit(i int) int {
-	total := 0
-	limit := 50
-	for j := 1; j <= i; j++ {
-		if i%j == 0 && j*limit >= i {
-			total += j * 11
+	for i := 1; i < size; i++ {
+		counter := 0
+		for j := i; j < size-1; j += i {
+			x[j] += s * i
+			counter++
+			if counter == max {
+				break
+			}
 		}
 	}
-	return total
-}
 
-func presents(i int) int {
-	total := 0
-	for j := 1; j <= i; j++ {
-		if i%j == 0 {
-			total += j * 10
+	fi := -1
+	for i, v := range x {
+		if v >= input {
+			fi = i
+			break
 		}
 	}
-	return total
+
+	return fi
 }
