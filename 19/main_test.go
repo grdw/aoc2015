@@ -6,8 +6,9 @@ import (
 
 func TestMolecules(t *testing.T) {
 	m := make(replacements)
-	m["H"] = []string{"HO", "OH"}
-	m["O"] = []string{"HH"}
+	m["HO"] = "H"
+	m["OH"] = "H"
+	m["HH"] = "O"
 
 	type test struct {
 		input  string
@@ -29,9 +30,11 @@ func TestMolecules(t *testing.T) {
 
 func TestGenMolecule(t *testing.T) {
 	m := make(replacements)
-	m["e"] = []string{"H", "O"}
-	m["H"] = []string{"HO", "OH"}
-	m["O"] = []string{"HH"}
+	m["H"] = "e"
+	m["O"] = "e"
+	m["HO"] = "H"
+	m["OH"] = "H"
+	m["HH"] = "O"
 
 	type test struct {
 		input  string

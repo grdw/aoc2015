@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type replacements = map[string][]string
+type replacements = map[string]string
 
 func main() {
 	reps, input := parse("input")
@@ -22,26 +22,19 @@ func main() {
 func recGenMolecule(input string, reps replacements) int {
 	res := math.MaxInt32
 	ml := math.MaxInt32
-	flippedReps := make(map[string]string)
-	for k, v := range reps {
-		for _, vv := range v {
-			flippedReps[vv] = k
-		}
-	}
 
-	genMolecule(input, "e", flippedReps, 0, &res, &ml)
+	genMolecule(input, reps, 0, &res, &ml)
 	return res
 }
 
 func genMolecule(
 	start string,
-	input string,
-	reps map[string]string,
+	reps replacements,
 	cycle int,
 	res *int,
 	minLen *int) {
 
-	if input == start && cycle < *res {
+	if start == "e" && cycle < *res {
 		*res = cycle
 	}
 
@@ -67,27 +60,25 @@ func genMolecule(
 
 	for l, _ := range list {
 		if len(l) == *minLen {
-			genMolecule(l, input, reps, cycle+1, res, minLen)
+			genMolecule(l, reps, cycle+1, res, minLen)
 		}
 	}
 }
 
 func molecules(input string, reps replacements) []string {
 	unique := make(map[string]bool)
-	for k, rep := range reps {
+	for rep, k := range reps {
 		re := regexp.MustCompile(k)
 		borders := re.FindAllStringIndex(input, -1)
 
-		for _, r := range rep {
-			for _, border := range borders {
-				result := fmt.Sprintf(
-					"%s%s%s",
-					input[:border[0]],
-					r,
-					input[border[1]:],
-				)
-				unique[result] = true
-			}
+		for _, border := range borders {
+			result := fmt.Sprintf(
+				"%s%s%s",
+				input[:border[0]],
+				rep,
+				input[border[1]:],
+			)
+			unique[result] = true
 		}
 	}
 
@@ -116,7 +107,7 @@ func parse(input string) (replacements, string) {
 
 		if strings.Contains(line, " => ") {
 			rawR := strings.Split(line, " => ")
-			reps[rawR[0]] = append(reps[rawR[0]], rawR[1])
+			reps[rawR[1]] = rawR[0]
 		} else if line != "" {
 			i = line
 		}
