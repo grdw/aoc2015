@@ -22,7 +22,6 @@ func main() {
 func recGenMolecule(input string, reps replacements) int {
 	res := math.MaxInt32
 	ml := math.MaxInt32
-	unique := make(map[string]bool)
 	flippedReps := make(map[string]string)
 	for k, v := range reps {
 		for _, vv := range v {
@@ -30,7 +29,7 @@ func recGenMolecule(input string, reps replacements) int {
 		}
 	}
 
-	genMolecule(input, "e", flippedReps, 0, &res, &ml, unique)
+	genMolecule(input, "e", flippedReps, 0, &res, &ml)
 	return res
 }
 
@@ -40,8 +39,7 @@ func genMolecule(
 	reps map[string]string,
 	cycle int,
 	res *int,
-	minLen *int,
-	unique map[string]bool) {
+	minLen *int) {
 
 	if input == start && cycle < *res {
 		*res = cycle
@@ -60,27 +58,16 @@ func genMolecule(
 				start[border[1]:],
 			)
 			list[result] = true
+			q := len(result)
+			if q < *minLen {
+				*minLen = q
+			}
 		}
 	}
 
 	for l, _ := range list {
-		q := len(l)
-		if q < *minLen {
-			*minLen = q
-		}
-	}
-
-	for l, _ := range list {
-		p := len(l)
-		if p > *minLen {
-			delete(list, l)
-		}
-	}
-
-	for l, _ := range list {
-		if !unique[l] && len(l) == *minLen {
-			unique[l] = true
-			genMolecule(l, input, reps, cycle+1, res, minLen, unique)
+		if len(l) == *minLen {
+			genMolecule(l, input, reps, cycle+1, res, minLen)
 		}
 	}
 }
