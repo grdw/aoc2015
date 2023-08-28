@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"regexp"
 	"strings"
@@ -15,6 +16,73 @@ func main() {
 	reps, input := parse("input")
 	possibilities := molecules(input, reps)
 	fmt.Println("Part 1:", len(possibilities))
+	fmt.Println("Part 2:", recGenMolecule(input, reps))
+}
+
+func recGenMolecule(input string, reps replacements) int {
+	res := math.MaxInt32
+	ml := math.MaxInt32
+	unique := make(map[string]bool)
+	flippedReps := make(map[string]string)
+	for k, v := range reps {
+		for _, vv := range v {
+			flippedReps[vv] = k
+		}
+	}
+
+	genMolecule(input, "e", flippedReps, 0, &res, &ml, unique)
+	return res
+}
+
+func genMolecule(
+	start string,
+	input string,
+	reps map[string]string,
+	cycle int,
+	res *int,
+	minLen *int,
+	unique map[string]bool) {
+
+	if input == start && cycle < *res {
+		*res = cycle
+	}
+
+	list := make(map[string]bool)
+	for k, rep := range reps {
+		re := regexp.MustCompile(k)
+		borders := re.FindAllStringIndex(start, -1)
+
+		for _, border := range borders {
+			result := fmt.Sprintf(
+				"%s%s%s",
+				start[:border[0]],
+				rep,
+				start[border[1]:],
+			)
+			list[result] = true
+		}
+	}
+
+	for l, _ := range list {
+		q := len(l)
+		if q < *minLen {
+			*minLen = q
+		}
+	}
+
+	for l, _ := range list {
+		p := len(l)
+		if p > *minLen {
+			delete(list, l)
+		}
+	}
+
+	for l, _ := range list {
+		if !unique[l] && len(l) == *minLen {
+			unique[l] = true
+			genMolecule(l, input, reps, cycle+1, res, minLen, unique)
+		}
+	}
 }
 
 func molecules(input string, reps replacements) []string {
